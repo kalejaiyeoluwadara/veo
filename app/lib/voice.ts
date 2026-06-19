@@ -58,13 +58,16 @@ export function detectEmotion(text: string): Emotion {
  * voice (the previous static settings ≈ "neutral") and nudged from there so
  * shifts between sentences stay believable rather than jarring.
  */
+// `speed` is the ElevenLabs delivery rate (1.0 = normal, lower = slower). We
+// keep her on the relaxed/slower side of natural across the board, with small
+// emotion-based variation — slower when soft, a touch quicker when excited.
 const VOICE_SETTINGS: Record<Emotion, VoiceSettings> = {
-  playful: { stability: 0.36, similarity_boost: 0.78, style: 0.45, use_speaker_boost: true, speed: 0.96 },
-  excited: { stability: 0.3, similarity_boost: 0.78, style: 0.55, use_speaker_boost: true, speed: 1.0 },
-  flirty: { stability: 0.44, similarity_boost: 0.8, style: 0.48, use_speaker_boost: true, speed: 0.92 },
-  tender: { stability: 0.62, similarity_boost: 0.8, style: 0.18, use_speaker_boost: true, speed: 0.9 },
-  sad: { stability: 0.7, similarity_boost: 0.8, style: 0.12, use_speaker_boost: true, speed: 0.88 },
-  neutral: { stability: 0.45, similarity_boost: 0.78, style: 0.2, use_speaker_boost: true, speed: 0.92 },
+  playful: { stability: 0.36, similarity_boost: 0.78, style: 0.45, use_speaker_boost: true, speed: 0.88 },
+  excited: { stability: 0.3, similarity_boost: 0.78, style: 0.55, use_speaker_boost: true, speed: 0.92 },
+  flirty: { stability: 0.44, similarity_boost: 0.8, style: 0.48, use_speaker_boost: true, speed: 0.85 },
+  tender: { stability: 0.62, similarity_boost: 0.8, style: 0.18, use_speaker_boost: true, speed: 0.83 },
+  sad: { stability: 0.7, similarity_boost: 0.8, style: 0.12, use_speaker_boost: true, speed: 0.82 },
+  neutral: { stability: 0.45, similarity_boost: 0.78, style: 0.2, use_speaker_boost: true, speed: 0.85 },
 };
 
 export function voiceSettingsFor(emotion: Emotion): VoiceSettings {

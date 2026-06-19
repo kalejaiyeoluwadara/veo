@@ -38,8 +38,32 @@ function extensionFor(mime: string): string {
   return "webm";
 }
 
+/** Soft rising "ping" the instant recording begins (Gemini-style feedback). */
+function playStartChime(): void {
+  try {
+    const ctx = new AudioContext();
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(660, now);
+    osc.frequency.exponentialRampToValueAtTime(1040, now + 0.1);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.14, now + 0.025);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.22);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.24);
+    osc.onended = () => ctx.close();
+  } catch {
+    // Audio not available — silent is fine.
+  }
+}
+
 export function useSpeechRecognition() {
   const [isListening, setIsListening] = useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false);
   const [transcript, setTranscript] = useState("");
   const [interimTranscript, setInterimTranscript] = useState("");
   const [isSupported, setIsSupported] = useState(true);
@@ -48,6 +72,7 @@ export function useSpeechRecognition() {
   const streamRef = useRef<MediaStream | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const mimeRef = useRef("audio/webm");
+  const cancelledRef = useRef(false);
 
   // Client-only feature detection (default true to avoid a hydration flip on
   // the common case where it's supported).
@@ -57,6 +82,10 @@ export function useSpeechRecognition() {
       typeof navigator.mediaDevices?.getUserMedia === "function" &&
       typeof window !== "undefined" &&
       "MediaRecorder" in window;
+    // Intentional: SSR can't detect browser APIs, so we start optimistic
+    // (true) and demote to false only on the client when unsupported. This
+    // one-time post-mount update avoids a hydration mismatch.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (!supported) setIsSupported(false);
   }, []);
 
@@ -66,7 +95,7 @@ export function useSpeechRecognition() {
   }, []);
 
   const transcribe = useCallback(async (blob: Blob) => {
-    setInterimTranscript("Transcribing…");
+    setIsTranscribing(true);
     try {
       const form = new FormData();
       form.append("file", blob, `recording.${extensionFor(mimeRef.current)}`);
@@ -84,6 +113,7 @@ export function useSpeechRecognition() {
       setInterimTranscript("");
       setTranscript("");
     } finally {
+      setIsTranscribing(false);
       setIsListening(false);
     }
   }, []);
@@ -93,6 +123,7 @@ export function useSpeechRecognition() {
 
     setTranscript("");
     setInterimTranscript("");
+    cancelledRef.current = false;
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -114,9 +145,15 @@ export function useSpeechRecognition() {
         const blob = new Blob(chunksRef.current, { type: mimeRef.current });
         chunksRef.current = [];
 
+        // Discarded via cancel — drop the clip, don't transcribe or send.
+        if (cancelledRef.current) {
+          cancelledRef.current = false;
+          setIsListening(false);
+          return;
+        }
+
         // Too short to contain real speech — bail without a server round-trip.
         if (blob.size < 1500) {
-          setInterimTranscript("");
           setIsListening(false);
           return;
         }
@@ -125,6 +162,7 @@ export function useSpeechRecognition() {
 
       recorderRef.current = recorder;
       recorder.start();
+      playStartChime();
       setIsListening(true);
     } catch (err) {
       console.error("Microphone access error:", err);
@@ -141,6 +179,15 @@ export function useSpeechRecognition() {
     }
   }, []);
 
+  /** Stop recording and throw the clip away (no transcription, no send). */
+  const cancelListening = useCallback(() => {
+    const recorder = recorderRef.current;
+    if (recorder && recorder.state !== "inactive") {
+      cancelledRef.current = true;
+      recorder.stop(); // → onstop sees the cancel flag and discards
+    }
+  }, []);
+
   // Tear down the mic on unmount.
   useEffect(() => {
     return () => {
@@ -152,11 +199,13 @@ export function useSpeechRecognition() {
 
   return {
     isListening,
+    isTranscribing,
     isSupported,
     transcript,
     interimTranscript,
     startListening,
     stopListening,
+    cancelListening,
     setTranscript,
     setInterimTranscript,
   };

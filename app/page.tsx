@@ -4,7 +4,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useChat } from "./hooks/use-chat";
 import { useSpeechRecognition } from "./hooks/use-speech-recognition";
 import ChatMessages from "./components/chat-messages";
-import MicButton from "./components/mic-button";
 import TextChatInput from "./components/text-chat-input";
 import AudioVisualizer from "./components/audio-visualizer";
 
@@ -39,6 +38,12 @@ export default function Home() {
       pendingSendRef.current = false;
     }
   }, [speech, chat]);
+
+  // Cancel a recording without sending it.
+  const handleMicCancel = useCallback(() => {
+    pendingSendRef.current = false;
+    speech.cancelListening();
+  }, [speech]);
 
   // When listening stops and we have a transcript, send it
   useEffect(() => {
@@ -224,23 +229,17 @@ export default function Home() {
 
       {/* Bottom control pad */}
       <div className="flex-shrink-0 px-4 pb-6 pt-3 border-t border-zinc-900/40 bg-black/80 backdrop-blur-md">
-        <div className="max-w-lg mx-auto space-y-4">
-          {/* Shutter Button Mic */}
-          <div className="flex justify-center select-none">
-            <MicButton
-              isListening={speech.isListening}
-              isSupported={speech.isSupported}
-              isDisabled={chat.isThinking}
-              interimTranscript={speech.interimTranscript}
-              onPress={handleMicPress}
-            />
-          </div>
-
-          {/* Capsule Text input */}
+        <div className="max-w-lg mx-auto">
+          {/* Capsule text input — mic lives inline on the right */}
           <TextChatInput
             onSend={handleTextSend}
             onCameraClick={handleCameraClick}
-            disabled={chat.isThinking || speech.isListening}
+            onMicToggle={handleMicPress}
+            onMicCancel={handleMicCancel}
+            isListening={speech.isListening}
+            isTranscribing={speech.isTranscribing}
+            isVoiceSupported={speech.isSupported}
+            disabled={chat.isThinking}
           />
         </div>
       </div>

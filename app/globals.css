@@ -271,6 +271,40 @@ body::before {
 }
 
 /* ============================================
+   Inline Voice Recording Waveform (Gemini-style)
+   ============================================ */
+
+.voice-wave {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 22px;
+}
+
+.voice-wave span {
+  display: block;
+  width: 3px;
+  height: 100%;
+  border-radius: 3px;
+  background: var(--au-amber);
+  transform: scaleY(0.25);
+  transform-origin: center;
+  animation: voiceWave 1s ease-in-out infinite;
+}
+
+@keyframes voiceWave {
+  0%,
+  100% {
+    transform: scaleY(0.22);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+/* ============================================
    Typing indicator
    ============================================ */
 

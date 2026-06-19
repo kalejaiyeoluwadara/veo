@@ -57,8 +57,9 @@ export default function ChatMessages({
                 className="text-sm leading-relaxed whitespace-pre-wrap break-words"
                 style={{ color: "var(--au-text-primary)" }}
               >
-                {msg.content}
+                {formatMessageContent(msg.content)}
               </div>
+
             </div>
           </div>
         );
@@ -125,3 +126,29 @@ export default function ChatMessages({
     </div>
   );
 }
+
+function formatMessageContent(content: string) {
+  if (!content) return "";
+  
+  // Split on bold (**) and italic (*) syntax
+  const parts = content.split(/(\*\*.*?\*\*|\*.*?\*)/g);
+  
+  return parts.map((part, index) => {
+    if (part.startsWith("**") && part.endsWith("**")) {
+      return (
+        <strong key={index} className="font-extrabold text-yellow-400">
+          {part.slice(2, -2)}
+        </strong>
+      );
+    }
+    if (part.startsWith("*") && part.endsWith("*")) {
+      return (
+        <em key={index} className="italic text-zinc-300">
+          {part.slice(1, -1)}
+        </em>
+      );
+    }
+    return part;
+  });
+}
+
