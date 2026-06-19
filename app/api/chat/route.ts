@@ -5,6 +5,7 @@ import {
   AUDREY_SYSTEM_PROMPT,
   buildInitPrompt,
 } from "../../lib/audrey";
+import { getFallbackConfig, streamFallbackReply } from "../../lib/fallback";
 
 interface ChatMessage {
   role: "user" | "assistant";
@@ -71,37 +72,60 @@ export async function POST(request: NextRequest) {
     }
   }
 
+  const prompt = isInit ? buildInitPrompt() : message.trim();
+  const fallback = getFallbackConfig();
+
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {
+      let full = "";
+      const emit = (text: string) => {
+        if (!text) return;
+        full += text;
+        controller.enqueue(sse({ type: "delta", text }));
+      };
+
       try {
-        const prompt = isInit ? buildInitPrompt() : message.trim();
         const chat = model.startChat({ history: formattedHistory });
         const result = await chat.sendMessageStream(prompt);
+        for await (const chunk of result.stream) emit(chunk.text());
+      } catch (geminiError) {
+        console.error("Gemini failed:", geminiError);
 
-        let full = "";
-        for await (const chunk of result.stream) {
-          const text = chunk.text();
-          if (text) {
-            full += text;
-            controller.enqueue(sse({ type: "delta", text }));
+        // Rate limits (429) and other Gemini errors surface here. As long as
+        // nothing has been streamed yet, retry the whole turn on the fallback
+        // model so the user still gets a complete reply.
+        if (full.length === 0 && fallback) {
+          try {
+            console.warn(`Falling back to ${fallback.model}`);
+            for await (const text of streamFallbackReply({
+              config: fallback,
+              system: AUDREY_SYSTEM_PROMPT,
+              history,
+              prompt,
+              temperature: AUDREY_GENERATION_CONFIG.temperature,
+            })) {
+              emit(text);
+            }
+          } catch (fallbackError) {
+            console.error("Fallback failed:", fallbackError);
           }
         }
-
-        if (!full.trim()) {
-          controller.enqueue(
-            sse({ type: "error", error: "Audrey had nothing to say" })
-          );
-        } else {
-          controller.enqueue(sse({ type: "done", text: full }));
-        }
-      } catch (error) {
-        const msg =
-          error instanceof Error ? error.message : "Something went wrong";
-        console.error("Chat stream error:", error);
-        controller.enqueue(sse({ type: "error", error: msg }));
-      } finally {
-        controller.close();
       }
+
+      if (!full.trim()) {
+        const fallbackMessages = [
+          "Babe, network is acting up here in Lagos abeg. Let me get better signal and I'll talk to you soon! 💕",
+          "Babe, my phone is almost dead and NEPA just took light. Let me find a charger and I'll chat you back shortly! 🔋",
+          "Babe, my mum is calling me to help her with something quickly. Let me run this errand and I'll be right back, okay? 😘"
+        ];
+        const busyText = fallbackMessages[Math.floor(Math.random() * fallbackMessages.length)];
+        controller.enqueue(sse({ type: "delta", text: busyText }));
+        controller.enqueue(sse({ type: "done", text: busyText }));
+      } else {
+        controller.enqueue(sse({ type: "done", text: full }));
+      }
+      controller.close();
+
     },
   });
 

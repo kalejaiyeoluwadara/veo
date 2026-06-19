@@ -82,12 +82,17 @@ export function buildInitPrompt(): string {
 
 /**
  * Generation tuning. Slightly high temperature + topP gives her natural
- * variety so she doesn't sound canned; the token cap keeps replies short
- * and snappy (which also lowers time-to-first-word).
+ * variety so she doesn't sound canned.
+ *
+ * IMPORTANT: gemini-2.5-flash is a *thinking* model and its hidden reasoning
+ * tokens are charged against maxOutputTokens. A tight cap here (we used to have
+ * 220) gets eaten by thinking and truncates her reply mid-sentence. We keep
+ * replies short via the prompt instead, and leave generous token headroom so
+ * the spoken answer is never cut off.
  */
 export const AUDREY_GENERATION_CONFIG: GenerationConfig = {
   temperature: 1.05,
   topP: 0.95,
   topK: 64,
-  maxOutputTokens: 220,
+  maxOutputTokens: 1024,
 };

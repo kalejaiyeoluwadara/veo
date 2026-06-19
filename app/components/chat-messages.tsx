@@ -6,34 +6,23 @@ import { Message } from "../hooks/use-chat";
 interface ChatMessagesProps {
   messages: Message[];
   isThinking: boolean;
+  isSpeaking: boolean;
 }
 
-export default function ChatMessages({ messages, isThinking }: ChatMessagesProps) {
+export default function ChatMessages({
+  messages,
+  isThinking,
+  isSpeaking,
+}: ChatMessagesProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, isThinking]);
+  }, [messages, isThinking, isSpeaking]);
 
-  if (messages.length === 0 && !isThinking) {
-    return (
-      <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
-        <div
-          className="text-6xl mb-4 animate-bounce"
-          style={{ filter: "drop-shadow(0 0 20px rgba(255, 252, 0, 0.4))" }}
-        >
-          👻
-        </div>
-        <h3 className="text-lg font-bold mb-2 text-yellow-400 tracking-wide">
-          Snap Audrey
-        </h3>
-        <p className="text-sm max-w-xs" style={{ color: "var(--au-text-secondary)" }}>
-          Audrey is on summer break in Lagos! Say hey to start the conversation.
-        </p>
-      </div>
-    );
-  }
+
+
 
   return (
     <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
@@ -75,20 +64,58 @@ export default function ChatMessages({ messages, isThinking }: ChatMessagesProps
         );
       })}
 
-      {/* Thinking indicator */}
+      {/* Snapchat Peeking Typing Indicator */}
       {isThinking && (
-        <div className="flex justify-start max-w-[90%]">
+        <div className="flex items-end gap-2.5 pl-1.5 pb-0.5">
+          {/* Peeking Bitmoji Avatar */}
           <div
-            className="border-l-[3.5px] border-rose-400 bg-rose-500/5 pl-3.5 py-2 pr-5 rounded-r-xl"
-            style={{ boxShadow: "inset 0 0 10px rgba(251, 113, 133, 0.02)" }}
+            className="w-10 h-10 rounded-full overflow-hidden border border-yellow-400/50 bg-zinc-900 flex-shrink-0 animate-fade-in-up"
+            style={{ boxShadow: "0 0 10px rgba(255, 252, 0, 0.15)" }}
           >
-            <span className="text-xs font-black tracking-widest uppercase block text-rose-400 mb-1">
-              Audrey
+            <img
+              src="/bitmoji_thinking.png"
+              alt="Audrey Typing"
+              className="w-full h-full object-cover scale-110"
+            />
+          </div>
+          {/* Typing speech bubble */}
+          <div className="bg-zinc-900/90 border border-zinc-800/80 px-3.5 py-2 rounded-2xl rounded-bl-sm text-xs font-semibold text-zinc-300 flex items-center gap-1.5 shadow-md animate-fade-in-up">
+            <span className="text-[10px] uppercase font-black text-rose-400 mr-0.5">
+              Audrey is typing
             </span>
-            <div className="flex items-center gap-1.5 py-1">
-              <div className="typing-dot" style={{ background: "var(--au-rose)" }} />
-              <div className="typing-dot" style={{ background: "var(--au-rose)" }} />
-              <div className="typing-dot" style={{ background: "var(--au-rose)" }} />
+            <div className="flex gap-[3px] py-1">
+              <div className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-bounce" style={{ animationDelay: "0ms" }} />
+              <div className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-bounce" style={{ animationDelay: "150ms" }} />
+              <div className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-bounce" style={{ animationDelay: "300ms" }} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Snapchat Peeking Speaking Indicator */}
+      {!isThinking && isSpeaking && (
+        <div className="flex items-end gap-2.5 pl-1.5 pb-0.5">
+          {/* Peeking Bitmoji Avatar */}
+          <div
+            className="w-10 h-10 rounded-full overflow-hidden border border-yellow-400/50 bg-zinc-900 flex-shrink-0 animate-fade-in-up"
+            style={{ boxShadow: "0 0 10px rgba(255, 252, 0, 0.15)" }}
+          >
+            <img
+              src="/bitmoji_speaking.png"
+              alt="Audrey Speaking"
+              className="w-full h-full object-cover scale-110"
+            />
+          </div>
+          {/* Speaking speech bubble */}
+          <div className="bg-zinc-900/90 border border-zinc-800/80 px-3.5 py-2 rounded-2xl rounded-bl-sm text-xs font-semibold text-zinc-300 flex items-center gap-2 shadow-md animate-fade-in-up">
+            <span className="text-[10px] uppercase font-black text-rose-400">
+              Audrey is speaking
+            </span>
+            {/* Tiny soundwave animation */}
+            <div className="flex items-end gap-[2px] h-3 select-none">
+              <div className="w-[2px] bg-rose-400 rounded-full animate-pulse h-2" style={{ animationDuration: "0.6s" }} />
+              <div className="w-[2px] bg-rose-400 rounded-full animate-pulse h-3" style={{ animationDuration: "0.4s" }} />
+              <div className="w-[2px] bg-rose-400 rounded-full animate-pulse h-1.5" style={{ animationDuration: "0.8s" }} />
             </div>
           </div>
         </div>

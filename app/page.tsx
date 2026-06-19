@@ -201,7 +201,9 @@ export default function Home() {
         <ChatMessages
           messages={chat.messages}
           isThinking={chat.isThinking}
+          isSpeaking={chat.isSpeaking}
         />
+
       </div>
 
       {/* Error alert banner */}
