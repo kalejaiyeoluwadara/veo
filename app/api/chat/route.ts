@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
         // model so the user still gets a complete reply.
         if (full.length === 0 && fallback) {
           try {
-            console.warn(`Falling back to ${fallback.model}`);
+            console.warn(`Falling back to: ${fallback.models.join(" → ")}`);
             for await (const text of streamFallbackReply({
               config: fallback,
               system: AUDREY_SYSTEM_PROMPT,
