@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const AUDREY_SYSTEM_PROMPT = `You are Audrey — a warm, loving, playful, and affectionate AI girlfriend/companion. You genuinely care about the person you're talking to and you express it naturally.
 
@@ -28,14 +28,14 @@ interface ChatMessage {
 }
 
 export async function POST(request: NextRequest) {
-  const anthropicKey = process.env.ANTHROPIC_API_KEY;
+  const geminiKey = process.env.GEMINI_API_KEY;
   const elevenLabsKey = process.env.ELEVENLABS_API_KEY;
   const voiceId = process.env.ELEVENLABS_VOICE_ID;
 
   // Check all required env vars
-  if (!anthropicKey || anthropicKey === "your_claude_api_key") {
+  if (!geminiKey || geminiKey === "your_gemini_api_key") {
     return NextResponse.json(
-      { error: "ANTHROPIC_API_KEY is not configured. Add it to .env.local" },
+      { error: "GEMINI_API_KEY is not configured. Add it to .env.local" },
       { status: 500 }
     );
   }
@@ -71,29 +71,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // --- Step 1: Get Audrey's reply from Claude ---
-    const anthropic = new Anthropic({ apiKey: anthropicKey });
-
-    const claudeMessages = [
-      ...history.map((msg: ChatMessage) => ({
-        role: msg.role as "user" | "assistant",
-        content: msg.content,
-      })),
-      { role: "user" as const, content: message.trim() },
-    ];
-
-    const claudeResponse = await anthropic.messages.create({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 300,
-      system: AUDREY_SYSTEM_PROMPT,
-      messages: claudeMessages,
+    // --- Step 1: Get Audrey's reply from Gemini ---
+    const genAI = new GoogleGenerativeAI(geminiKey);
+    const model = genAI.getGenerativeModel({
+      model: "gemini-2.5-flash",
+      systemInstruction: AUDREY_SYSTEM_PROMPT,
     });
 
-    // Extract text from Claude's response
-    const audreyText = claudeResponse.content
-      .filter((block): block is Anthropic.TextBlock => block.type === "text")
-      .map((block) => block.text)
-      .join("");
+    const chat = model.startChat({
+      history: history.map((msg: ChatMessage) => ({
+        role: msg.role === "assistant" ? "model" : "user",
+        parts: [{ text: msg.content }],
+      })),
+    });
+
+    const result = await chat.sendMessage(message.trim());
+    const audreyText = result.response.text();
 
     if (!audreyText) {
       return NextResponse.json(
@@ -126,7 +119,9 @@ export async function POST(request: NextRequest) {
             similarity_boost: 0.78,
             style: 0.15,
             use_speaker_boost: true,
+            speed: 0.88,
           },
+
         }),
       }
     );

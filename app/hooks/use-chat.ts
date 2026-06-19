@@ -75,7 +75,7 @@ export function useChat() {
       setIsThinking(true);
 
       try {
-        // Build history for Claude (last 20 messages for context)
+        // Build history for Gemini (last 20 messages for context)
         const history = [...messages, userMessage]
           .slice(-20)
           .map((msg) => ({
@@ -196,5 +196,5 @@ function base64ToBlob(base64: string, mimeType: string): Blob {
     byteArrays.push(new Uint8Array(byteNumbers));
   }
 
-  return new Blob(byteArrays, { type: mimeType });
+  return new Blob(byteArrays as unknown as BlobPart[], { type: mimeType });
 }
