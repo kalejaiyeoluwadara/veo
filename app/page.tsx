@@ -19,10 +19,9 @@ export default function Home() {
       speech.stopListening();
       pendingSendRef.current = true;
     } else {
-      // Stop Audrey if she's speaking
-      if (chat.isSpeaking) {
-        chat.stopSpeaking();
-      }
+      // Barge-in: the moment you start speaking, cut off whatever Audrey is
+      // saying or generating so she stops and listens.
+      chat.interrupt();
       speech.startListening();
       pendingSendRef.current = false;
     }
@@ -41,12 +40,9 @@ export default function Home() {
     }
   }, [speech.isListening, speech.transcript, speech.interimTranscript, chat, speech]);
 
-  // Handle text send
+  // Handle text send — sendMessage interrupts any in-progress reply itself.
   const handleTextSend = useCallback(
     (text: string) => {
-      if (chat.isSpeaking) {
-        chat.stopSpeaking();
-      }
       chat.sendMessage(text);
     },
     [chat]
@@ -146,16 +142,16 @@ export default function Home() {
             <MicButton
               isListening={speech.isListening}
               isSupported={speech.isSupported}
-              isDisabled={chat.isThinking}
+              isDisabled={false}
               interimTranscript={speech.interimTranscript}
               onPress={handleMicPress}
             />
           </div>
 
-          {/* Text Input */}
+          {/* Text Input — stays usable mid-reply so you can barge in by typing */}
           <TextChatInput
             onSend={handleTextSend}
-            disabled={chat.isThinking || speech.isListening}
+            disabled={speech.isListening}
           />
         </div>
       </div>
