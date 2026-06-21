@@ -53,8 +53,6 @@ GEMINI_API_KEY=your_gemini_api_key
 
 # ElevenLabs configuration for voice synthesis and transcription
 ELEVENLABS_API_KEY=your_elevenlabs_key
-# ELEVENLABS_VOICE_ID is optional and defaults to Sarah (EXAVITQu4vr4xnSDxMaL)
-# ELEVENLABS_VOICE_ID=your_voice_id
 
 # Optional OpenRouter key for service fallback
 OPENROUTER_API_KEY=your_openrouter_api_key
