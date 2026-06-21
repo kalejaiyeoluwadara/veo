@@ -8,11 +8,11 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Audrey ♡",
+  title: "Voice ♡",
   description: "Your AI voice companion — speak, listen, connect.",
   manifest: "/manifest.json",
   appleWebApp: {
-    title: "Audrey",
+    title: "Voice",
     statusBarStyle: "black-translucent",
     capable: true,
   },

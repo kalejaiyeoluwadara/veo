@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
  *
  * The client records the user's utterance (push-to-talk) and POSTs it here as
  * multipart form-data under "file"; we forward it to Scribe and return the
- * plain text. Same vendor/key as Audrey's voice (ELEVENLABS_API_KEY).
+ * plain text. Same vendor/key as Voice's voice (ELEVENLABS_API_KEY).
  */
 export async function POST(request: NextRequest) {
   const key = process.env.ELEVENLABS_API_KEY;

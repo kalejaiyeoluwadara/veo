@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Content, GoogleGenerativeAI } from "@google/generative-ai";
 import {
-  AUDREY_GENERATION_CONFIG,
-  AUDREY_SYSTEM_PROMPT,
+  VOICE_GENERATION_CONFIG,
+  VOICE_SYSTEM_PROMPT,
   buildInitPrompt,
-} from "../../lib/audrey";
+} from "../../lib/persona";
 import { getFallbackConfig, streamFallbackReply } from "../../lib/fallback";
 
 interface ChatMessage {
@@ -51,18 +51,18 @@ export async function POST(request: NextRequest) {
   const genAI = new GoogleGenerativeAI(geminiKey);
   const model = genAI.getGenerativeModel({
     model: "gemini-2.5-flash",
-    systemInstruction: AUDREY_SYSTEM_PROMPT,
-    generationConfig: AUDREY_GENERATION_CONFIG,
+    systemInstruction: VOICE_SYSTEM_PROMPT,
+    generationConfig: VOICE_GENERATION_CONFIG,
   });
 
   const isInit = message.trim() === "INIT_CONVERSATION";
 
   // Gemini requires history to start with a "user" turn. Prepend a synthetic
-  // greeting if the stored history happens to lead with Audrey.
+  // greeting if the stored history happens to lead with Voice.
   const formattedHistory: Content[] = [];
   if (!isInit) {
     if (history.length > 0 && history[0].role === "assistant") {
-      formattedHistory.push({ role: "user", parts: [{ text: "Hey Audrey" }] });
+      formattedHistory.push({ role: "user", parts: [{ text: "Hey Voice" }] });
     }
     for (const msg of history) {
       formattedHistory.push({
@@ -99,10 +99,10 @@ export async function POST(request: NextRequest) {
             console.warn(`Falling back to: ${fallback.models.join(" → ")}`);
             for await (const text of streamFallbackReply({
               config: fallback,
-              system: AUDREY_SYSTEM_PROMPT,
+              system: VOICE_SYSTEM_PROMPT,
               history,
               prompt,
-              temperature: AUDREY_GENERATION_CONFIG.temperature,
+              temperature: VOICE_GENERATION_CONFIG.temperature,
             })) {
               emit(text);
             }

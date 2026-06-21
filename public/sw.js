@@ -1,4 +1,4 @@
-const CACHE_NAME = "audrey-v1";
+const CACHE_NAME = "voice-v1";
 const ASSETS_TO_CACHE = [
   "/",
   "/manifest.json",

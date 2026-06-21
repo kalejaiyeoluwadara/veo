@@ -49,7 +49,7 @@ export default function ChatMessages({
                   isUser ? "text-sky-400" : "text-rose-400"
                 }`}
               >
-                {isUser ? "Me" : "Audrey"}
+                {isUser ? "Me" : "Voice"}
               </span>
 
               {/* Message text */}
@@ -75,14 +75,14 @@ export default function ChatMessages({
           >
             <img
               src="/bitmoji_thinking.png"
-              alt="Audrey Typing"
+              alt="Voice Typing"
               className="w-full h-full object-cover scale-110"
             />
           </div>
           {/* Typing speech bubble */}
           <div className="bg-zinc-900/90 border border-zinc-800/80 px-3.5 py-2 rounded-2xl rounded-bl-sm text-xs font-semibold text-zinc-300 flex items-center gap-1.5 shadow-md animate-fade-in-up">
             <span className="text-[10px] uppercase font-black text-rose-400 mr-0.5">
-              Audrey is typing
+              Voice is typing
             </span>
             <div className="flex gap-[3px] py-1">
               <div className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-bounce" style={{ animationDelay: "0ms" }} />
@@ -103,14 +103,14 @@ export default function ChatMessages({
           >
             <img
               src="/bitmoji_speaking.png"
-              alt="Audrey Speaking"
+              alt="Voice Speaking"
               className="w-full h-full object-cover scale-110"
             />
           </div>
           {/* Speaking speech bubble */}
           <div className="bg-zinc-900/90 border border-zinc-800/80 px-3.5 py-2 rounded-2xl rounded-bl-sm text-xs font-semibold text-zinc-300 flex items-center gap-2 shadow-md animate-fade-in-up">
             <span className="text-[10px] uppercase font-black text-rose-400">
-              Audrey is speaking
+              Voice is speaking
             </span>
             {/* Tiny soundwave animation */}
             <div className="flex items-end gap-[2px] h-3 select-none">

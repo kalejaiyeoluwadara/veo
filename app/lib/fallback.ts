@@ -116,7 +116,7 @@ async function* streamOneModel(params: {
   if (config.baseUrl.includes("openrouter.ai")) {
     headers["HTTP-Referer"] =
       process.env.OPENROUTER_SITE_URL || "http://localhost:3000";
-    headers["X-Title"] = process.env.OPENROUTER_APP_NAME || "Audrey";
+    headers["X-Title"] = process.env.OPENROUTER_APP_NAME || "Voice";
   }
 
   const res = await fetch(`${config.baseUrl}/chat/completions`, {

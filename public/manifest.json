@@ -1,6 +1,6 @@
 {
-  "name": "Audrey",
-  "short_name": "Audrey",
+  "name": "voice",
+  "short_name": "voice",
   "description": "Your AI voice companion — speak, listen, connect.",
   "start_url": "/",
   "display": "standalone",

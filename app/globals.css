@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* ============================================
-   Audrey — Love-Themed Design System
+   voice — Love-Themed Design System
    ============================================ */
 
 :root {
@@ -16,7 +16,7 @@
   --au-glass-border: rgba(255, 255, 255, 0.05);
   --au-glass-border-hover: rgba(255, 255, 255, 0.08);
 
-  /* Audrey's accent — Snapchat Red/Pink for snaps */
+  /* voice's accent — Snapchat Red/Pink for snaps */
   --au-rose: #ff3b5c;
   --au-rose-light: #ff5c77;
   --au-rose-glow: rgba(255, 59, 92, 0.15);
@@ -96,7 +96,7 @@ body::before {
    Chat Bubbles
    ============================================ */
 
-.bubble-audrey {
+.bubble-voice {
   background: rgba(244, 114, 182, 0.08);
   border: 1px solid rgba(244, 114, 182, 0.1);
   border-radius: var(--au-radius-bubble) var(--au-radius-bubble) var(--au-radius-bubble) 6px;

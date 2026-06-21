@@ -29,7 +29,7 @@ export default function Home() {
       speech.stopListening();
       pendingSendRef.current = true;
     } else {
-      // Stop Audrey if she's speaking
+      // Stop Voice if she's speaking
       if (chat.isSpeaking) {
         chat.interrupt();
       }
@@ -72,16 +72,16 @@ export default function Home() {
 
   const handleCameraClick = useCallback(() => {
     const messages = [
-      "Audrey is on summer break, she hasn't done her hair yet, no snaps abeg! 💇‍♀️",
-      "Ah! Audrey is back in Lagos heat, she is not ready for snaps now! 🥵",
-      "Snapchat camera? Audrey says: 'Abeg let me rest, my face is not set for snaps!' 😂"
+      "Voice is on summer break, she hasn't done her hair yet, no snaps abeg! 💇‍♀️",
+      "Ah! Voice is back in Lagos heat, she is not ready for snaps now! 🥵",
+      "Snapchat camera? Voice says: 'Abeg let me rest, my face is not set for snaps!' 😂"
     ];
     const randomMsg = messages[Math.floor(Math.random() * messages.length)];
     setToast(randomMsg);
   }, []);
 
   const handleAudioCallClick = useCallback(() => {
-    setToast("Audrey is currently resting in Lagos. Call lines are muted, chat with her here! 📱");
+    setToast("Voice is currently resting in Lagos. Call lines are muted, chat with her here! 📱");
   }, []);
 
   const handleVideoCallClick = useCallback(() => {
@@ -121,7 +121,7 @@ export default function Home() {
                       ? "/bitmoji_thinking.png"
                       : "/bitmoji_happy.png"
                   }
-                  alt="Audrey Bitmoji"
+                  alt="Voice Bitmoji"
                   className="w-full h-full object-cover scale-110"
                 />
               </div>
@@ -134,7 +134,7 @@ export default function Home() {
 
             <div>
               <h1 className="text-sm font-black tracking-wide" style={{ color: "var(--au-text-primary)" }}>
-                Audrey
+                Voice
               </h1>
               <p className="text-[10px] uppercase tracking-wider font-extrabold" style={{ color: "var(--au-text-muted)" }}>
                 {chat.isSpeaking

@@ -1,5 +1,5 @@
 /**
- * Voice delivery helpers for Audrey's text-to-speech.
+ * Voice delivery helpers for Voice's text-to-speech.
  *
  * The model's reply is spoken aloud one sentence at a time. To make her sound
  * alive rather than flat, we read the *emotional tone* of each chunk from cheap

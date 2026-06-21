@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { detectEmotion, stripForSpeech, voiceSettingsFor } from "../../lib/voice";
 
 /**
- * Renders a single chunk of Audrey's reply to speech. The client calls this
+ * Renders a single chunk of Voice's reply to speech. The client calls this
  * once per sentence as the text streams in, so audio for the first sentence
  * can start playing while later sentences are still being generated.
  *
@@ -20,11 +20,11 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  if (!voiceId || voiceId === "your_audrey_voice_id") {
+  if (!voiceId || voiceId === "your_voice_voice_id") {
     return NextResponse.json(
       {
         error:
-          "ELEVENLABS_VOICE_ID is not configured. Go to ElevenLabs > My Voices > Audrey > Copy Voice ID, then add to .env.local",
+          "ELEVENLABS_VOICE_ID is not configured. Go to ElevenLabs > My Voices > Voice > Copy Voice ID, then add to .env.local",
       },
       { status: 500 }
     );
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
     headers: {
       "Content-Type": "audio/mpeg",
       "Cache-Control": "no-store",
-      "X-Audrey-Emotion": emotion,
+      "X-Voice-Emotion": emotion,
     },
   });
 }

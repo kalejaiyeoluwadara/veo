@@ -211,7 +211,7 @@ export function useChat() {
       abortRef.current = controller;
 
       // The assistant bubble is created on the first token and filled live.
-      const assistantId = `audrey-${Date.now()}`;
+      const assistantId = `voice-${Date.now()}`;
       let started = false;
       const ensureAssistantBubble = () => {
         if (started) return;
@@ -335,7 +335,7 @@ export function useChat() {
     setIsThinking(false);
   }, [stopAll]);
 
-  // Audrey opens the conversation on first load.
+  // voice opens the conversation on first load.
   useEffect(() => {
     if (!hasInitialized.current) {
       hasInitialized.current = true;
